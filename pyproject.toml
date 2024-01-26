@@ -1,0 +1,21 @@
+[project]
+name = "confluence_todoist"
+description = "Transfer Confluence tasks to Todoist"
+version = "0.0.0"
+authors = [
+    { name = "Philipp Schmutz", email = "philipp@schmutz.eu" }
+]
+dependencies = [
+    "atlassian-python-api",
+    "click",
+    "python-dotenv",
+    "todoist-api-python",
+    "tqdm",
+]
+
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.2,<4"]
+
+[project.scripts]
+confluence_todoist = "confluence_todoist.cli:main"
