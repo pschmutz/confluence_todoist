@@ -15,6 +15,10 @@ class TodoistConfluence(TodoistAPI):
         todoist_api_token = getenv("TODOIST_API_TOKEN")
         return cls(token=todoist_api_token)
 
+    @classmethod
+    def from_config(cls, config):
+        return cls(token=config["todoist_api_token"])
+
     def add_confluence_task(self, text):
         task = self.add_task(
             content=text,

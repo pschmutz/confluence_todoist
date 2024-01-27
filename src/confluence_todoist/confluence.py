@@ -8,7 +8,7 @@ from atlassian import Confluence
 class Confluence(Confluence):
     @classmethod
     def from_dotenv(cls):
-        load_dotenv()
+        load_dotenv("~/.config/confluence_todoist/.env")
         url = os.getenv("ATLASSIAN_URL")
         api_token = os.getenv("ATLASSIAN_API_TOKEN")
         username = os.getenv("ATLASSIAN_USERNAME")
@@ -16,6 +16,15 @@ class Confluence(Confluence):
             url=url,
             username=username,
             password=api_token,
+            cloud=True,
+        )
+
+    @classmethod
+    def from_config(cls, config):
+        return cls(
+            url=config["atlassian_url"],
+            username=config["atlassian_username"],
+            password=config["atlassian_api_token"],
             cloud=True,
         )
 

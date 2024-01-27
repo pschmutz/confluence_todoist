@@ -7,11 +7,32 @@ from confluence_todoist.confluence import Confluence, task_to_text
 from confluence_todoist.todoist import TodoistConfluence
 import os
 import time
+import configparser
+import configparser
 
 
-def atlassian_user_id_from_dotenv():
-    load_dotenv()
-    return os.getenv("ATLASSIAN_USER_ID")
+def get_config():
+    config = configparser.ConfigParser()
+    config_file = os.path.expanduser("~/.config/confluence_todoist/config.ini")
+
+    if os.path.exists(config_file):
+        config.read(config_file)
+    else:
+        config["ATLASSIAN"] = {
+            "ATLASSIAN_URL": input("Enter ATLASSIAN_URL: "),
+            "ATLASSIAN_USERNAME": input("Enter ATLASSIAN_USERNAME: "),
+            "ATLASSIAN_API_TOKEN": input("Enter ATLASSIAN_API_TOKEN: "),
+            "ATLASSIAN_USER_ID": input("Enter ATLASSIAN_USER_ID: "),
+        }
+        config["TODOIST"] = {
+            "TODOIST_API_TOKEN": input("Enter TODOIST_API_TOKEN: "),
+        }
+
+        with open(config_file, "w") as file:
+            config.write(file)
+
+    print(config)
+    return config
 
 
 def get_timestamp(since):
@@ -31,9 +52,7 @@ def get_timestamp(since):
 
 
 def save_timestamp():
-    last_execution_file = os.path.expanduser(
-        "~/.config/confluence_todoist/timestamp"
-    )
+    last_execution_file = os.path.expanduser("~/.config/confluence_todoist/timestamp")
 
     os.makedirs(os.path.dirname(last_execution_file), exist_ok=True)
 
@@ -47,12 +66,13 @@ def save_timestamp():
 @click.option("--since", type=click.DateTime(), help="since when to get tasks")
 def main(since):
     since_timestamp = get_timestamp(since)
+    config = get_config()
 
-    confluence = Confluence.from_dotenv()
-    todoist = TodoistConfluence.from_dotenv()
+    confluence = Confluence.from_config(config["ATLASSIAN"])
+    todoist = TodoistConfluence.from_config(config["TODOIST"])
 
     tasks = confluence.get_tasks(
-        assigned_to=atlassian_user_id_from_dotenv(),
+        assigned_to=config["ATLASSIAN"]["ATLASSIAN_USER_ID"],
         status="incomplete",
         body_format="atlas_doc_format",
         created_at_from=since_timestamp * 1000,
