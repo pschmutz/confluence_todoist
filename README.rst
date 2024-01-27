@@ -34,5 +34,7 @@ On the first run the script will ask you for the following information:
  * atlassian_api_token (see https://id.atlassian.com/manage-profile/security/api-tokens)
  * atlassian_user_id (you can extract this from the URL when you open your profile in Confluence)
  * todoist_api_token (see https://todoist.com/prefs/integrations)
+ * todoist_project (The name of the project in Todoist where you want to import the tasks. e.g. "Inbox")
+ * todoist_section (The name of the section in Todoist where you want to import the tasks. e.g. "Confluence". Needs to exist already)
 
 After that, the script will remember when you ran it the last time and only fetch tasks that were created since then.

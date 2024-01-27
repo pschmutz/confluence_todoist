@@ -26,13 +26,14 @@ def get_config():
         }
         config["TODOIST"] = {
             "TODOIST_API_TOKEN": input("Enter TODOIST_API_TOKEN: "),
+            "PROJECT_NAME": input("Enter PROJECT_NAME: "),
+            "SECTION_NAME": input("Enter SECTION_NAME: "),
         }
 
         os.makedirs(os.path.dirname(config_file), exist_ok=True)
         with open(config_file, "w") as file:
             config.write(file)
 
-    print(config)
     return config
 
 
