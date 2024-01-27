@@ -1,3 +1,4 @@
+import logging
 import tqdm
 import json
 import click
@@ -68,6 +69,8 @@ def main(since):
 
     confluence = Confluence.from_config(config["ATLASSIAN"])
     todoist = TodoistConfluence.from_config(config["TODOIST"])
+
+    logging.info("Getting tasks from Confluence")
 
     tasks = confluence.get_tasks(
         assigned_to=config["ATLASSIAN"]["ATLASSIAN_USER_ID"],

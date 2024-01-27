@@ -47,7 +47,6 @@ class Confluence(Confluence):
         completed_at_from=None,
         completed_at_to=None,
         cursor=None,
-        limit=None,
     ):
         path = "api/v2/tasks"
         params = {}
@@ -84,8 +83,7 @@ class Confluence(Confluence):
             params["completed-at-to"] = completed_at_to
         if cursor:
             params["cursor"] = cursor
-        if limit:
-            params["limit"] = limit
+        params["limit"] = 250
         response = self.get(path, params=params)
         return response["results"]
 
