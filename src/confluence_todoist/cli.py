@@ -28,6 +28,7 @@ def get_config():
             "TODOIST_API_TOKEN": input("Enter TODOIST_API_TOKEN: "),
         }
 
+        os.makedirs(os.path.dirname(config_file), exist_ok=True)
         with open(config_file, "w") as file:
             config.write(file)
 
@@ -53,11 +54,7 @@ def get_timestamp(since):
 
 def save_timestamp():
     last_execution_file = os.path.expanduser("~/.config/confluence_todoist/timestamp")
-
-    os.makedirs(os.path.dirname(last_execution_file), exist_ok=True)
-
     timestamp = int(time.time())
-
     with open(last_execution_file, "w") as file:
         file.write(str(timestamp))
 
