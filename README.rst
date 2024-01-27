@@ -38,3 +38,8 @@ On the first run the script will ask you for the following information:
  * todoist_section (The name of the section in Todoist where you want to import the tasks. e.g. "Confluence". Needs to exist already)
 
 After that, the script will remember when you ran it the last time and only fetch tasks that were created since then.
+
+Limitations / Missing Features
++++++++++++++++++++++++++++++++
+
+Please have a look at the open Github issues https://github.com/pschmutz/confluence_todoist/issues
