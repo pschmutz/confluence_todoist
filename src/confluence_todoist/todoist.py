@@ -43,7 +43,6 @@ class TodoistConfluence(TodoistAPI):
     def add_confluence_task(self, text):
         task = self.add_task(
             content=text,
-            priority=4,
             project_id=self.project_id,
             section_id=self.section_id,
         )
