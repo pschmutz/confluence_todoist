@@ -24,30 +24,6 @@ def get_config():
     }
     return config
 
-
-def get_timestamp(since):
-    if since:
-        since_timestamp = int(since.timestamp())
-    else:
-        last_execution_file = os.path.expanduser(
-            "~/.config/confluence_todoist/timestamp"
-        )
-        if os.path.exists(last_execution_file):
-            with open(last_execution_file, "r") as file:
-                since_timestamp = int(file.read().strip())
-        else:
-            since_timestamp = 0
-
-    return since_timestamp
-
-
-def save_timestamp():
-    last_execution_file = os.path.expanduser("~/.config/confluence_todoist/timestamp")
-    timestamp = int(time.time())
-    with open(last_execution_file, "w") as file:
-        file.write(str(timestamp))
-
-
 def sync_confluence_todoist(since):
     since_timestamp = since.timestamp()
     config = get_config()
@@ -76,7 +52,6 @@ def sync_confluence_todoist(since):
         full_task_text = f"{task_text} [{page_title}]({page_link})"
         tqdm.tqdm.write(full_task_text)
         todoist.add_confluence_task(full_task_text)
-    save_timestamp()
 
 
 if __name__ == "__main__":
