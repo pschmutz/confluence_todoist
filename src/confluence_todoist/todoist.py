@@ -25,19 +25,11 @@ class TodoistConfluence(TodoistAPI):
         raise ValueError(f"Project {project_name} not found")
 
     @classmethod
-    def from_dotenv(cls):
-        load_dotenv()
-        todoist_api_token = getenv("TODOIST_API_TOKEN")
-        return cls(
-            token=todoist_api_token, project_name="Inbox", section_name="Confluence"
-        )
-
-    @classmethod
     def from_config(cls, config):
         return cls(
-            token=config["todoist_api_token"],
-            project_name=config["project_name"],
-            section_name=config["section_name"],
+            token=config["API_TOKEN"],
+            project_name=config["PROJECT"],
+            section_name=config["SECTION"],
         )
 
     def add_confluence_task(self, text):

@@ -22,9 +22,9 @@ class Confluence(Confluence):
     @classmethod
     def from_config(cls, config):
         return cls(
-            url=config["atlassian_url"],
-            username=config["atlassian_username"],
-            password=config["atlassian_api_token"],
+            url=config["URL"],
+            username=config["USERNAME"],
+            password=config["API_TOKEN"],
             cloud=True,
         )
 

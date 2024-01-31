@@ -1,40 +1,27 @@
+from datetime import datetime
 import logging
 import tqdm
 import json
-import click
 import os
-from dotenv import load_dotenv
 from confluence_todoist.confluence import Confluence, task_to_text
 from confluence_todoist.todoist import TodoistConfluence
 import os
 import time
-import configparser
-import configparser
-
+from dotenv import load_dotenv
 
 def get_config():
-    config = configparser.ConfigParser()
-    config_file = os.path.expanduser("~/.config/confluence_todoist/config.ini")
-
-    if os.path.exists(config_file):
-        config.read(config_file)
-    else:
-        config["ATLASSIAN"] = {
-            "ATLASSIAN_URL": input("Enter ATLASSIAN_URL: "),
-            "ATLASSIAN_USERNAME": input("Enter ATLASSIAN_USERNAME: "),
-            "ATLASSIAN_API_TOKEN": input("Enter ATLASSIAN_API_TOKEN: "),
-            "ATLASSIAN_USER_ID": input("Enter ATLASSIAN_USER_ID: "),
-        }
-        config["TODOIST"] = {
-            "TODOIST_API_TOKEN": input("Enter TODOIST_API_TOKEN: "),
-            "PROJECT_NAME": input("Enter PROJECT_NAME: "),
-            "SECTION_NAME": input("Enter SECTION_NAME: "),
-        }
-
-        os.makedirs(os.path.dirname(config_file), exist_ok=True)
-        with open(config_file, "w") as file:
-            config.write(file)
-
+    config = {}
+    config["ATLASSIAN"] = {
+        "URL": os.getenv("ATLASSIAN_URL"),
+        "USERNAME": os.getenv("ATLASSIAN_USERNAME"),
+        "API_TOKEN": os.getenv("ATLASSIAN_API_TOKEN"),
+        "USER_ID": os.getenv("ATLASSIAN_USER_ID"),
+    }
+    config["TODOIST"] = {
+        "API_TOKEN": os.getenv("TODOIST_API_TOKEN"),
+        "PROJECT": os.getenv("TODOIST_PROJECT"),
+        "SECTION": os.getenv("TODOIST_SECTION"),
+    }
     return config
 
 
@@ -61,10 +48,8 @@ def save_timestamp():
         file.write(str(timestamp))
 
 
-@click.command()
-@click.option("--since", type=click.DateTime(), help="since when to get tasks")
-def main(since):
-    since_timestamp = get_timestamp(since)
+def sync_confluence_todoist(since):
+    since_timestamp = since.timestamp()
     config = get_config()
 
     confluence = Confluence.from_config(config["ATLASSIAN"])
@@ -73,10 +58,10 @@ def main(since):
     logging.info("Getting tasks from Confluence")
 
     tasks = confluence.get_tasks(
-        assigned_to=config["ATLASSIAN"]["ATLASSIAN_USER_ID"],
+        assigned_to=config["ATLASSIAN"]["USER_ID"],
         status="incomplete",
         body_format="atlas_doc_format",
-        created_at_from=since_timestamp * 1000,
+        created_at_from=int(since_timestamp * 1000),
     )
 
     print(f"Got {len(tasks)} tasks from Confluence. Will now add them to Todoist.")
@@ -95,4 +80,5 @@ def main(since):
 
 
 if __name__ == "__main__":
-    main()
+    load_dotenv()
+    sync_confluence_todoist(datetime(2023, 1, 30))
