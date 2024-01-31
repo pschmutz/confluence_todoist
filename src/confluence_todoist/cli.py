@@ -42,7 +42,7 @@ def sync_confluence_todoist(since):
 
     print(f"Got {len(tasks)} tasks from Confluence. Will now add them to Todoist.")
 
-    for task in tqdm.tqdm(tasks):
+    for task in tasks:
         task_body = task["body"]["atlas_doc_format"]["value"]
         task_body_json = json.loads(task_body)
         task_text = task_to_text(task_body_json)
@@ -50,7 +50,7 @@ def sync_confluence_todoist(since):
         page_title = page["title"]
         page_link = page["_links"]["base"] + page["_links"]["webui"]
         full_task_text = f"{task_text} [{page_title}]({page_link})"
-        tqdm.tqdm.write(full_task_text)
+        print(f"IMPORTED: {full_task_text}")
         todoist.add_confluence_task(full_task_text)
 
 
