@@ -88,9 +88,9 @@ def main(since):
         page = confluence.get_page_by_id(task["pageId"])
         page_title = page["title"]
         page_link = page["_links"]["base"] + page["_links"]["webui"]
-        full_task_text = f"{task_text} [{page_title}]({page_link})"
-        tqdm.tqdm.write(full_task_text)
-        todoist.add_confluence_task(full_task_text)
+        link_text = f"[{page_title}]({page_link})"
+        tqdm.tqdm.write(task_text)
+        todoist.add_confluence_task(task_text, link_text)
     save_timestamp()
 
 
