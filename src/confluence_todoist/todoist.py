@@ -40,9 +40,10 @@ class TodoistConfluence(TodoistAPI):
             section_name=config["section_name"],
         )
 
-    def add_confluence_task(self, text):
+    def add_confluence_task(self, text, description):
         task = self.add_task(
             content=text,
+            description=description,
             project_id=self.project_id,
             section_id=self.section_id,
         )
