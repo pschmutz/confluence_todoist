@@ -9,7 +9,18 @@ from confluence_todoist.todoist import TodoistConfluence
 import os
 import time
 import configparser
-import configparser
+
+
+CONFIG = {"ATLASSIAN": {"ATLASSIAN_URL": "in the format: https://your-company.atlassian.net",
+                        "ATLASSIAN_USERNAME": "user@company.com",
+                        "ATLASSIAN_API_TOKEN": "as generated in your user account"
+                        },
+          "TODOIST": {"TODOIST_API_TOKEN": "as generated from your Todoist settings",
+                      "PROJECT_NAME": "of the project to sync tasks into",
+                      "SECTION_NAME": "of the section within the project"
+                      },
+          "MAIN": {"REPLACE_USERNAME": "type 'yes' to remove your name from tasks"}
+          }
 
 
 def get_config():
@@ -18,20 +29,17 @@ def get_config():
 
     if os.path.exists(config_file):
         config.read(config_file)
-    else:
-        config["ATLASSIAN"] = {
-            "ATLASSIAN_URL": input("Enter ATLASSIAN_URL: "),
-            "ATLASSIAN_USERNAME": input("Enter ATLASSIAN_USERNAME: "),
-            "ATLASSIAN_API_TOKEN": input("Enter ATLASSIAN_API_TOKEN: "),
-            "ATLASSIAN_USER_ID": input("Enter ATLASSIAN_USER_ID: "),
-        }
-        config["TODOIST"] = {
-            "TODOIST_API_TOKEN": input("Enter TODOIST_API_TOKEN: "),
-            "PROJECT_NAME": input("Enter PROJECT_NAME: "),
-            "SECTION_NAME": input("Enter SECTION_NAME: "),
-        }
+
+    for section, values in CONFIG.items():
+        if section not in config:
+            config[section] = {}
+
+        config[section] = {value: config[section].get(value) or \
+                           input(f"Enter {value} ({description}): ")
+                           for value, description in values.items()}
 
         os.makedirs(os.path.dirname(config_file), exist_ok=True)
+
         with open(config_file, "w") as file:
             config.write(file)
 
@@ -85,6 +93,11 @@ def main(since):
         task_body = task["body"]["atlas_doc_format"]["value"]
         task_body_json = json.loads(task_body)
         task_text = task_to_text(task_body_json)
+
+        if config["MAIN"]["REPLACE_USERNAME"] == 'yes':
+            task_text = task_text.replace(f"@{user[displayName]}", "")
+        task_text = task_text.strip()
+
         page = confluence.get_page_by_id(task["pageId"])
         page_title = page["title"]
         page_link = page["_links"]["base"] + page["_links"]["webui"]
