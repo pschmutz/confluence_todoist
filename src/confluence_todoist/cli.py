@@ -95,7 +95,7 @@ def main(since):
         task_text = task_to_text(task_body_json)
 
         if config["MAIN"]["REPLACE_USERNAME"] == 'yes':
-            task_text = task_text.replace(f"@{user[displayName]}", "")
+            task_text = task_text.replace(f"@{user['displayName']}", "")
         task_text = task_text.strip()
 
         page = confluence.get_page_by_id(task["pageId"])
