@@ -28,6 +28,11 @@ class Confluence(Confluence):
             cloud=True,
         )
 
+    def get_user(self):
+        path = "rest/api/user/current"
+        response = self.get(path)
+        return response
+
     def get_tasks(
         self,
         body_format=None,
@@ -88,17 +93,32 @@ class Confluence(Confluence):
         return response["results"]
 
 
-def task_to_text(task):
-    if "content" in task:
-        content = task["content"]
-        text = ""
-        for item in content:
-            if "content" in item:
-                paragraph = item["content"]
-                for element in paragraph:
-                    if "text" in element:
-                        text += element["text"]
-        return text
-    else:
+def task_to_md(task):
+    content = task.get("content")
+
+    if not content:
         logging.warning(f"Task {task} has no content")
         return ""
+
+    text = ""
+    for item in content:
+        paragraph = item.get("content")
+        if not paragraph:
+            continue
+
+        for element in paragraph:
+            etype = element["type"]
+            if etype == "mention":
+                text += element["attrs"].get("text", "")
+            elif etype == "inlineCard":
+                text += element["attrs"].get("url", "")
+            elif etype == "text":
+                link = ""
+                for mark in element.get("marks", []):
+                    if mark["type"] == "link":
+                        link = mark["attrs"].get("href", "")
+                if link:
+                    text += f"[{element['text']}]({link})"
+                else:
+                    text += element["text"]
+    return text
