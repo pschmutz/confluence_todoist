@@ -4,7 +4,7 @@ import json
 import click
 import os
 from dotenv import load_dotenv
-from confluence_todoist.confluence import Confluence, task_to_text
+from confluence_todoist.confluence import Confluence, task_to_md
 from confluence_todoist.todoist import TodoistConfluence
 import os
 import time
@@ -58,7 +58,7 @@ def get_timestamp(since):
                 since_timestamp = int(file.read().strip())
         else:
             since_timestamp = 0
-
+            
     return since_timestamp
 
 
@@ -77,25 +77,28 @@ def main(since):
 
     confluence = Confluence.from_config(config["ATLASSIAN"])
     todoist = TodoistConfluence.from_config(config["TODOIST"])
+    user = confluence.get_user()
 
     logging.info("Getting tasks from Confluence")
 
     tasks = confluence.get_tasks(
-        assigned_to=config["ATLASSIAN"]["ATLASSIAN_USER_ID"],
+        assigned_to=user["accountId"],
         status="incomplete",
         body_format="atlas_doc_format",
         created_at_from=since_timestamp * 1000,
     )
+
 
     print(f"Got {len(tasks)} tasks from Confluence. Will now add them to Todoist.")
 
     for task in tqdm.tqdm(tasks):
         task_body = task["body"]["atlas_doc_format"]["value"]
         task_body_json = json.loads(task_body)
-        task_text = task_to_text(task_body_json)
+        task_text = task_to_md(task_body_json)
 
         if config["MAIN"]["REPLACE_USERNAME"] == 'yes':
             task_text = task_text.replace(f"@{user['displayName']}", "")
+
         task_text = task_text.strip()
 
         page = confluence.get_page_by_id(task["pageId"])
