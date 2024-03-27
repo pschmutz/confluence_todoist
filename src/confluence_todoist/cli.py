@@ -19,6 +19,7 @@ CONFIG = {"ATLASSIAN": {"ATLASSIAN_URL": "in the format: https://your-company.at
                       "PROJECT_NAME": "of the project to sync tasks into",
                       "SECTION_NAME": "of the section within the project"
                       },
+          "MAIN": {"REPLACE_USERNAME": "type 'yes' to remove your name from tasks"}
           }
 
 
@@ -94,6 +95,10 @@ def main(since):
         task_body = task["body"]["atlas_doc_format"]["value"]
         task_body_json = json.loads(task_body)
         task_text = task_to_md(task_body_json)
+
+        if config["MAIN"]["REPLACE_USERNAME"] == 'yes':
+            task_text = task_text.replace(f"@{user['displayName']}", "")
+
         task_text = task_text.strip()
 
         page = confluence.get_page_by_id(task["pageId"])
